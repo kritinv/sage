@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Dname_card.dart';
+import 'custom_widgets/name_card.dart';
 
 class Profile extends StatelessWidget {
   static const routeName = '/profile';
@@ -10,18 +10,19 @@ class Profile extends StatelessWidget {
 
     return MaterialApp(
       home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.green[900],
-            leading: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-              ),
+        appBar: AppBar(
+          backgroundColor: Colors.green[900],
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Icon(
+              Icons.arrow_back_ios_rounded,
             ),
           ),
-          body: Stack(children: [
+        ),
+        body: Stack(
+          children: [
             Container(
                 alignment: Alignment.center,
                 child: ListView(children: [
@@ -155,7 +156,9 @@ class Profile extends StatelessWidget {
                   //decoration: new BoxDecoration(color: Colors.red),
                   child: new Text('hello'),
                 )),
-          ])),
+          ],
+        ),
+      ),
     );
   }
 }

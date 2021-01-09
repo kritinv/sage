@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:the_unnamed_startup/Dname_card.dart';
-import 'package:the_unnamed_startup/Aconstants.dart';
+import 'package:the_unnamed_startup/custom_widgets/name_card.dart';
+import 'package:the_unnamed_startup/data/data.dart';
 import 'dart:collection';
 
 class Home extends StatefulWidget {
@@ -74,7 +74,7 @@ class _HomeState extends State<Home> {
         .toList();
   }
 
-  //
+  // menu bar variables and functions
 
   //***************************************************************************
 

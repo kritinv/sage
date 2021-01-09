@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:the_unnamed_startup/Chome.dart';
 import 'package:the_unnamed_startup/Eprofile.dart';
+import 'package:the_unnamed_startup/main_screens.dart';
 
 void main() {
   runApp(MyApp());
@@ -24,13 +24,7 @@ class MyAppState extends State<MyApp> {
       child: MaterialApp(
         initialRoute: '/',
         routes: {
-          '/': (context) => Scaffold(
-                backgroundColor: Colors.grey[200],
-                appBar: AppBar(
-                  backgroundColor: Colors.green[900],
-                ),
-                body: Home(),
-              ),
+          '/': (context) => MainScreen(),
           Profile.routeName: (context) => Profile(),
         },
       ),
