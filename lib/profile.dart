@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_unnamed_startup/time_slot.dart';
 import 'custom_widgets/name_card.dart';
+import 'login.dart';
 
 class Profile extends StatelessWidget {
   static const routeName = '/profile';

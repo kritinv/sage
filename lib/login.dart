@@ -250,10 +250,14 @@ class _SecondState extends State<Second> {
                       style: TextStyle(fontSize: 12.0),
                     ),
                     RaisedButton(
-                      child: Text(' Sign Up'),
-                      color: Color(0xffFF8F00),
-                      onPressed: () {},
-                    ),
+                        child: Text(' Sign Up'),
+                        color: Color(0xffFF8F00),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MainScreen(0)));
+                        }),
                   ],
                 ),
               ),

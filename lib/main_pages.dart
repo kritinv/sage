@@ -5,6 +5,7 @@ import 'package:the_unnamed_startup/main_pages/bookings.dart';
 import 'package:the_unnamed_startup/data/data.dart';
 import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'meeting_confirmation.dart';
+import 'login.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/mainscreen';
@@ -176,6 +177,16 @@ class _MainScreenState extends State<MainScreen> {
                 });
               },
             ),
+            SizedBox(
+              height: 30.0,
+            ),
+            RaisedButton(
+                child: Text(' Logout'),
+                color: Color(0xffFF8F00),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login(0)));
+                }),
           ],
         ),
       ),
