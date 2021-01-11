@@ -7,6 +7,7 @@ import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'meeting_confirmation.dart';
 
 class MainScreen extends StatefulWidget {
+  static const routeName = '/mainscreen';
   int selectedIndex;
   MainScreen(this.selectedIndex);
 
@@ -17,7 +18,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int selectedIndex;
   int count = 0;
-
   _MainScreenState(selectedIndex) {
     this.selectedIndex = selectedIndex;
   }
