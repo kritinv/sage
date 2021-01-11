@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:the_unnamed_startup/time_slot.dart';
 import 'custom_widgets/name_card.dart';
 
 class Profile extends StatelessWidget {
@@ -7,6 +8,33 @@ class Profile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ScreenArguments args = ModalRoute.of(context).settings.arguments;
+    Future<void> showMyDialog() async {
+      return showDialog<void>(
+        context: context,
+        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('AlertDialog Title'),
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text('Cannot meet with yourself!'),
+                  Text('Click ok to continue'),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Ok'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
 
     return MaterialApp(
       home: Scaffold(
@@ -141,20 +169,26 @@ class Profile extends StatelessWidget {
                 bottom: 20,
                 start: 20,
                 child: new RaisedButton(
-                  onPressed: () => print("Button Pressed"),
+                  onPressed: () {
+                    if (args.firstName + " " + args.lastName == "Ray Doe") {
+                      showMyDialog();
+                    } else {
+                      Navigator.pushNamed(
+                        context,
+                        TimeSlot.routeName,
+                        arguments: args,
+                      );
+                    }
+                  },
                   textColor: Colors.green,
                   color: Colors.white,
-                  //splashColor: Colors.red[200],
                   onHighlightChanged: (boolValue) => print(boolValue),
                   elevation: 8,
                   shape: RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(18.0),
                     side: BorderSide(color: Colors.green),
                   ),
-                  //width: 100.0,
-                  //height: 80.0,
-                  //decoration: new BoxDecoration(color: Colors.red),
-                  child: new Text('hello'),
+                  child: new Text('meet'),
                 )),
           ],
         ),
@@ -162,13 +196,3 @@ class Profile extends StatelessWidget {
     );
   }
 }
-
-// body: Center(
-//          child: new Container(
-//              width: 240,
-//              child: new Text('Pathid Liamtrakoolpanich',
-//                  overflow: TextOverflow.fade,
-//                  softWrap: false,
-//                  maxLines: 1,
-//                  style: new TextStyle(fontSize: 25))),
-//        ),

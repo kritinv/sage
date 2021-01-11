@@ -1,14 +1,5 @@
 import 'package:flutter/material.dart';
-
-class ScreenArguments {
-  final String firstName;
-  final String lastName;
-  final String bio;
-  final String rating;
-  final String image;
-  ScreenArguments(
-      this.firstName, this.lastName, this.bio, this.rating, this.image);
-}
+import 'package:the_unnamed_startup/data/data.dart';
 
 class BookingCard extends StatelessWidget {
   final firstName;
@@ -16,13 +7,15 @@ class BookingCard extends StatelessWidget {
   final bio;
   final rating;
   final image;
+  final reload;
 
   BookingCard(
       {@required this.firstName,
       @required this.lastName,
       @required this.bio,
       @required this.rating,
-      @required this.image});
+      @required this.image,
+      this.reload});
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +49,15 @@ class BookingCard extends StatelessWidget {
                           ]),
                     ),
                   ),
+                  Column(children: [
+                    CloseButton(
+                      onPressed: () {
+                        userId.remove(firstName + " " + lastName);
+                        reload();
+                      },
+                    ),
+                    SizedBox(height: 30)
+                  ])
                 ],
               ),
               SizedBox(height: 15),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:the_unnamed_startup/Eprofile.dart';
+import 'package:the_unnamed_startup/profile.dart';
 
 class ScreenArguments {
   final String firstName;
@@ -7,8 +7,9 @@ class ScreenArguments {
   final String bio;
   final String rating;
   final String image;
-  ScreenArguments(
-      this.firstName, this.lastName, this.bio, this.rating, this.image);
+  final List availability;
+  ScreenArguments(this.firstName, this.lastName, this.bio, this.rating,
+      this.image, this.availability);
 }
 
 class NameCard extends StatelessWidget {
@@ -17,21 +18,23 @@ class NameCard extends StatelessWidget {
   final bio;
   final rating;
   final image;
+  final availability;
 
   NameCard(
       {@required this.firstName,
       @required this.lastName,
       @required this.bio,
       @required this.rating,
-      @required this.image});
+      @required this.image,
+      @required this.availability});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(context, Profile.routeName,
-            arguments:
-                ScreenArguments(firstName, lastName, bio, rating, image));
+            arguments: ScreenArguments(
+                firstName, lastName, bio, rating, image, availability));
       },
       child: Card(
         margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),

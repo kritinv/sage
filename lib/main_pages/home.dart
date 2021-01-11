@@ -5,6 +5,8 @@ import 'package:the_unnamed_startup/data/data.dart';
 import 'dart:collection';
 
 class Home extends StatefulWidget {
+  const Home({Key key, this.filteredList}) : super(key: key);
+  final List filteredList;
   @override
   _HomeState createState() => _HomeState();
 }
@@ -12,11 +14,33 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   // search bar variables
   final TextEditingController _filter = TextEditingController();
-  String _searchText = "";
-  List filteredNames = List<String>.from(names);
+  String _searchText = '';
+  String dropdownValue = 'Rating';
+  List filteredNames;
+  List<Widget> cardList;
+
+  @override
+  void initState() {
+    filteredNames = widget.filteredList;
+    sort('Rating');
+    this.cardList = filteredNames
+        .map((name) => NameCard(
+            firstName: cardID[name]['firstName'],
+            lastName: cardID[name]['lastName'],
+            rating: cardID[name]['rating'],
+            bio: cardID[name]['bio'],
+            image: cardID[name]['image'],
+            availability: cardID[name]['availability']))
+        .toList();
+    super.initState();
+  }
 
   // search bar functions
   _HomeState() {
+    print("new home object created");
+    if (filteredNames == null) {
+      filteredNames = List<String>.from(names);
+    }
     _filter.addListener(() {
       if (_filter.text.isEmpty) {
         setState(() {
@@ -45,21 +69,38 @@ class _HomeState extends State<Home> {
     }
   }
 
-  // filter variable
-  String dropdownValue = 'Rating';
+  void _search(value) {
+    _searchText = value;
+    _buildList();
+    setState(() {
+      buildCardList();
+    });
+  }
 
   // filter function
+  void sort(newValue) {
+    dropdownValue = newValue;
+    String split = newValue.split(" ").join();
+    String join = split[0].toLowerCase() + split.substring(1, split.length);
+    print(filteredNames);
 
-  // card list variable
-  List<Widget> cardList = names
-      .map((name) => NameCard(
-            firstName: cardID[name]['firstName'],
-            lastName: cardID[name]['lastName'],
-            rating: cardID[name]['rating'],
-            bio: cardID[name]['bio'],
-            image: cardID[name]['image'],
-          ))
-      .toList();
+    List sortedList = filteredNames.map((name) => cardID[name][join]).toList();
+    Map mappings = {
+      for (int i = 0; i < sortedList.length; i++)
+        filteredNames[i]: sortedList[i]
+    };
+
+    var sortedKeys = mappings.keys.toList(growable: false)
+      ..sort((k1, k2) => mappings[k1].compareTo(mappings[k2]));
+    LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(sortedKeys,
+        key: (k) => k, value: (k) => mappings[k]);
+
+    if (join == 'rating') {
+      filteredNames = sortedMap.keys.toList().reversed.toList();
+    } else {
+      filteredNames = sortedMap.keys.toList();
+    }
+  }
 
   // card list functions
   void buildCardList() {
@@ -70,11 +111,10 @@ class _HomeState extends State<Home> {
               rating: cardID[name]['rating'],
               bio: cardID[name]['bio'],
               image: cardID[name]['image'],
+              availability: cardID[name]['availability'],
             ))
         .toList();
   }
-
-  // menu bar variables and functions
 
   //***************************************************************************
 
@@ -103,12 +143,8 @@ class _HomeState extends State<Home> {
                     hintStyle: TextStyle(fontSize: 14.0),
                     contentPadding: EdgeInsets.only(bottom: 5.0),
                   ),
-                  onSubmitted: (value) {
-                    _searchText = value;
-                    _buildList();
-                    setState(() {
-                      buildCardList();
-                    });
+                  onChanged: (value) {
+                    _search(value);
                   },
                 ),
               ),
@@ -139,33 +175,7 @@ class _HomeState extends State<Home> {
                       ),
                       onChanged: (String newValue) {
                         setState(() {
-                          dropdownValue = newValue;
-                          String split = newValue.split(" ").join();
-                          String join = split[0].toLowerCase() +
-                              split.substring(1, split.length);
-                          print(join);
-
-                          List sortedList = filteredNames
-                              .map((name) => cardID[name][join])
-                              .toList();
-                          Map mappings = {
-                            for (int i = 0; i < sortedList.length; i++)
-                              filteredNames[i]: sortedList[i]
-                          };
-
-                          var sortedKeys = mappings.keys.toList(growable: false)
-                            ..sort((k1, k2) =>
-                                mappings[k1].compareTo(mappings[k2]));
-                          LinkedHashMap sortedMap =
-                              new LinkedHashMap.fromIterable(sortedKeys,
-                                  key: (k) => k, value: (k) => mappings[k]);
-
-                          if (join == 'rating') {
-                            filteredNames =
-                                sortedMap.keys.toList().reversed.toList();
-                          } else {
-                            filteredNames = sortedMap.keys.toList();
-                          }
+                          sort(newValue);
                           buildCardList();
                         });
                       },
@@ -199,9 +209,10 @@ class _HomeState extends State<Home> {
         ),
 
         // Card List
-        Container(
-          height: 400,
-          child: ListView(children: cardList),
+        Expanded(
+          child: Container(
+            child: ListView(children: cardList),
+          ),
         ),
       ],
     );
