@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "41041569043",
+    "project_id": "sage-22a4f",
+    "storage_bucket": "sage-22a4f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:41041569043:android:890c4ac31f2e15356426e6",
+        "android_client_info": {
+          "package_name": "com.example.the_unnamed_startup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "41041569043-hlknbr7vv2t1vvm9q6kku8bs6bupkvks.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYIPHKKIhm9EC8U-6utaNeoSYLRmfvZpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "41041569043-hlknbr7vv2t1vvm9q6kku8bs6bupkvks.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

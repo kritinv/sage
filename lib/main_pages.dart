@@ -5,6 +5,8 @@ import 'package:the_unnamed_startup/main_pages/bookings.dart';
 import 'package:the_unnamed_startup/data/data.dart';
 import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'meeting_confirmation.dart';
+import 'package:provider/provider.dart';
+import 'main.dart';
 import 'login.dart';
 
 class MainScreen extends StatefulWidget {
@@ -184,8 +186,7 @@ class _MainScreenState extends State<MainScreen> {
                 child: Text(' Logout'),
                 color: Color(0xffFF8F00),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Login(0)));
+                  context.read<AuthenticationService>().signOut();
                 }),
           ],
         ),

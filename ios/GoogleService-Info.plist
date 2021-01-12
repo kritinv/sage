@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>41041569043-u7vqiode6lcg8m15t1ac05hr49ksmonn.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.41041569043-u7vqiode6lcg8m15t1ac05hr49ksmonn</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCVo9L62lsKIbqYXdSkY7BuFVOPPqyd2lk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>41041569043</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.theUnnamedStartup</string>
+	<key>PROJECT_ID</key>
+	<string>sage-22a4f</string>
+	<key>STORAGE_BUCKET</key>
+	<string>sage-22a4f.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:41041569043:ios:540a357ac9abc2d26426e6</string>
+</dict>
+</plist>

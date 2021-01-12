@@ -1,283 +1,187 @@
 import 'package:flutter/material.dart';
+import 'package:the_unnamed_startup/main.dart';
 import 'main_pages.dart';
+import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
-  int selectedIndex;
-  Login(this.selectedIndex);
-
   @override
-  _LoginState createState() => _LoginState(selectedIndex);
+  _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
-  int selectedIndex;
-  int count = 0;
+  Widget inputForm;
+  Widget spacer = SizedBox(height: 20);
 
-  _LoginState(selectedIndex) {
-    this.selectedIndex = selectedIndex;
+  @override
+  void initState() {
+    super.initState();
+    inputForm = LoginForm(toSignUp);
+  }
+
+  void toLogIn() {
+    setState(() {
+      inputForm = LoginForm(toSignUp);
+    });
+  }
+
+  void toSignUp() {
+    setState(() {
+      inputForm = SignUp(toLogIn);
+    });
   }
 
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: Colors.white,
       body: Container(
-        margin: EdgeInsets.all(20.0),
-        height: height,
-        width: width,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: width,
-                height: height * 0.33,
-                child: Image(
-                  image: AssetImage('images/logo.PNG'),
-                  fit: BoxFit.contain,
-                ),
+        margin: EdgeInsets.all(50.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              padding: EdgeInsets.only(bottom: 20),
+              child: Image.asset(
+                'images/logo.PNG',
+                fit: BoxFit.fitWidth,
+                width: 160,
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Login',
-                      style: TextStyle(
-                          fontSize: 25.0, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: ' Email',
-                  suffixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(70.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: ' Password',
-                  suffixIcon: Icon(Icons.visibility_off),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(70.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 50.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Forget password?',
-                      style: TextStyle(fontSize: 12.0),
-                    ),
-                    RaisedButton(
-                      child: Text('Login'),
-                      color: Color(0xffFF8F00),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => MainScreen(0)));
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.0),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Second()));
-                },
-                child: Text.rich(
-                  TextSpan(text: 'Don\'t have an account', children: [
-                    TextSpan(
-                      text: ' Sign Up',
-                      style: TextStyle(color: Color(0xffFF8F00)),
-                    ),
-                  ]),
-                ),
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 20),
+            Container(child: inputForm),
+          ],
         ),
       ),
     );
   }
 }
 
-class Second extends StatefulWidget {
-  @override
-  _SecondState createState() => _SecondState();
-}
+class SignUp extends StatelessWidget {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final TextEditingController confirm = TextEditingController();
+  final Widget inputSpacer = SizedBox(height: 20.0);
+  final Function stateChange;
+  SignUp(this.stateChange);
 
-class _SecondState extends State<Second> {
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        margin: EdgeInsets.all(20.0),
-        height: height,
-        width: width,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: width,
-                height: height * 0.07,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      'Sign Up',
-                      style: TextStyle(
-                          fontSize: 25.0, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Email',
-                  suffixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: 'Password',
-                  suffixIcon: Icon(Icons.visibility_off),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Age',
-                  suffixIcon: Icon(Icons.confirmation_number),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Gender',
-                  suffixIcon: Icon(Icons.confirmation_number),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Country',
-                  suffixIcon: Icon(Icons.flag),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              TextField(
-                obscureText: true,
-                decoration: InputDecoration(
-                  hintText: 'Profession',
-                  suffixIcon: Icon(Icons.work),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(50.0),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 30.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Forget password?',
-                      style: TextStyle(fontSize: 12.0),
-                    ),
-                    RaisedButton(
-                        child: Text(' Sign Up'),
-                        color: Color(0xffFF8F00),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MainScreen(0)));
-                        }),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20.0),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Login(0)));
-                },
-                child: Text.rich(
-                  TextSpan(text: 'Already have an account', children: [
-                    TextSpan(
-                      text: ' Sign In',
-                      style: TextStyle(color: Color(0xffFF8F00)),
-                    ),
-                  ]),
-                ),
-              ),
-            ],
-          ),
+    return Column(children: [
+      Input(textState: false, hintText: "First Name"),
+      inputSpacer,
+      Input(textState: false, hintText: "Last Name"),
+      inputSpacer,
+      Input(textState: false, hintText: "Email"),
+      inputSpacer,
+      Input(textState: true, hintText: "Password"),
+      inputSpacer,
+      Container(
+        width: double.infinity,
+        child: RaisedButton(
+            child: Text(' Sign Up'),
+            color: Color(0xffFF8F00),
+            onPressed: () {
+              context.read<AuthenticationService>().signUp(
+                    email: email.text.trim(),
+                    password: password.text.trim(),
+                  );
+            }),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          'Forget password?',
+          style: TextStyle(fontSize: 12.0),
+        ),
+      ),
+      SizedBox(height: 20.0),
+      GestureDetector(
+        onTap: () {
+          stateChange();
+        },
+        child: Text.rich(
+          TextSpan(text: 'Already have an account', children: [
+            TextSpan(
+              text: ' Sign In',
+              style: TextStyle(color: Color(0xffFF8F00)),
+            ),
+          ]),
+        ),
+      ),
+    ]);
+  }
+}
+
+class LoginForm extends StatelessWidget {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final Widget spacer = SizedBox(height: 20.0);
+  final Function changeState;
+  LoginForm(this.changeState);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: [
+      Input(textState: false, hintText: "Email"),
+      spacer,
+      Input(textState: true, hintText: "Password"),
+      spacer,
+      Container(
+        width: double.infinity,
+        child: RaisedButton(
+          child: Text('Login'),
+          color: Color(0xffFF8F00),
+          onPressed: () {
+            context.read<AuthenticationService>().signIn(
+                  email: email.text.trim(),
+                  password: password.text.trim(),
+                );
+          },
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Text(
+          'Forget password?',
+          style: TextStyle(fontSize: 12.0),
+        ),
+      ),
+      spacer,
+      GestureDetector(
+        onTap: () {
+          changeState();
+        },
+        child: Text.rich(
+          TextSpan(text: 'Don\'t have an account', children: [
+            TextSpan(
+              text: ' Sign Up',
+              style: TextStyle(color: Color(0xffFF8F00)),
+            ),
+          ]),
+        ),
+      ),
+    ]);
+  }
+}
+
+class Input extends StatelessWidget {
+  final bool textState;
+  final String hintText;
+  Input({this.textState, this.hintText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      child: TextField(
+        obscureText: textState,
+        decoration: InputDecoration(
+          fillColor: Colors.grey[50],
+          filled: true,
+          contentPadding: EdgeInsets.all(10.0),
+          hintText: hintText,
+          hintStyle: TextStyle(fontSize: 14),
+          border: OutlineInputBorder(),
         ),
       ),
     );
