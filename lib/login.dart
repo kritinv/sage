@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_unnamed_startup/main.dart';
-import 'main_pages.dart';
 import 'package:provider/provider.dart';
+import 'main.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -39,6 +39,8 @@ class _LoginState extends State<Login> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            spacer,
+            spacer,
             Container(
               padding: EdgeInsets.only(bottom: 20),
               child: Image.asset(
@@ -56,35 +58,46 @@ class _LoginState extends State<Login> {
   }
 }
 
-class SignUp extends StatelessWidget {
-  final TextEditingController email = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  final TextEditingController confirm = TextEditingController();
-  final Widget inputSpacer = SizedBox(height: 20.0);
+class SignUp extends StatefulWidget {
   final Function stateChange;
   SignUp(this.stateChange);
 
   @override
+  _SignUpState createState() => _SignUpState();
+}
+
+class _SignUpState extends State<SignUp> {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final TextEditingController firstName = TextEditingController();
+  final TextEditingController lastName = TextEditingController();
+  final Widget inputSpacer = SizedBox(height: 20.0);
+  String errorMessage = "";
+
+  @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Input(textState: false, hintText: "First Name"),
+      Input(textState: false, hintText: "First Name", controller: firstName),
       inputSpacer,
-      Input(textState: false, hintText: "Last Name"),
+      Input(textState: false, hintText: "Last Name", controller: lastName),
       inputSpacer,
-      Input(textState: false, hintText: "Email"),
+      Input(textState: false, hintText: "Email", controller: email),
       inputSpacer,
-      Input(textState: true, hintText: "Password"),
+      Input(textState: true, hintText: "Password", controller: password),
       inputSpacer,
       Container(
         width: double.infinity,
         child: RaisedButton(
             child: Text(' Sign Up'),
             color: Color(0xffFF8F00),
-            onPressed: () {
-              context.read<AuthenticationService>().signUp(
+            onPressed: () async {
+              String a = await context.read<AuthenticationService>().signUp(
                     email: email.text.trim(),
                     password: password.text.trim(),
                   );
+              setState(() {
+                errorMessage = a;
+              });
             }),
       ),
       Padding(
@@ -97,7 +110,7 @@ class SignUp extends StatelessWidget {
       SizedBox(height: 20.0),
       GestureDetector(
         onTap: () {
-          stateChange();
+          widget.stateChange();
         },
         child: Text.rich(
           TextSpan(text: 'Already have an account', children: [
@@ -108,34 +121,55 @@ class SignUp extends StatelessWidget {
           ]),
         ),
       ),
+      Padding(
+        padding: EdgeInsets.only(top: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.amber[800],
+            fontSize: 10,
+          ),
+        ),
+      )
     ]);
   }
 }
 
-class LoginForm extends StatelessWidget {
-  final TextEditingController email = TextEditingController();
-  final TextEditingController password = TextEditingController();
-  final Widget spacer = SizedBox(height: 20.0);
+class LoginForm extends StatefulWidget {
   final Function changeState;
   LoginForm(this.changeState);
 
   @override
+  _LoginFormState createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+  final Widget spacer = SizedBox(height: 20.0);
+  String errorMessage = "";
+
+  @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Input(textState: false, hintText: "Email"),
+      Input(textState: false, hintText: "Email", controller: email),
       spacer,
-      Input(textState: true, hintText: "Password"),
+      Input(textState: true, hintText: "Password", controller: password),
       spacer,
       Container(
         width: double.infinity,
         child: RaisedButton(
           child: Text('Login'),
           color: Color(0xffFF8F00),
-          onPressed: () {
-            context.read<AuthenticationService>().signIn(
+          onPressed: () async {
+            String a = await context.read<AuthenticationService>().signIn(
                   email: email.text.trim(),
                   password: password.text.trim(),
                 );
+            setState(() {
+              errorMessage = a;
+            });
           },
         ),
       ),
@@ -149,7 +183,7 @@ class LoginForm extends StatelessWidget {
       spacer,
       GestureDetector(
         onTap: () {
-          changeState();
+          widget.changeState();
         },
         child: Text.rich(
           TextSpan(text: 'Don\'t have an account', children: [
@@ -160,6 +194,17 @@ class LoginForm extends StatelessWidget {
           ]),
         ),
       ),
+      Padding(
+        padding: EdgeInsets.only(top: 30),
+        child: Text(
+          errorMessage,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.amber[800],
+            fontSize: 10,
+          ),
+        ),
+      )
     ]);
   }
 }
@@ -167,13 +212,15 @@ class LoginForm extends StatelessWidget {
 class Input extends StatelessWidget {
   final bool textState;
   final String hintText;
-  Input({this.textState, this.hintText});
+  final TextEditingController controller;
+  Input({this.textState, this.hintText, this.controller});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 40,
       child: TextField(
+        controller: controller,
         obscureText: textState,
         decoration: InputDecoration(
           fillColor: Colors.grey[50],
