@@ -7,6 +7,7 @@ import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'meeting_confirmation.dart';
 import 'package:provider/provider.dart';
 import 'main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'login.dart';
 
 class MainScreen extends StatefulWidget {

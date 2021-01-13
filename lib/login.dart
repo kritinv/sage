@@ -94,6 +94,8 @@ class _SignUpState extends State<SignUp> {
               String a = await context.read<AuthenticationService>().signUp(
                     email: email.text.trim(),
                     password: password.text.trim(),
+                    firstName: firstName.text.trim(),
+                    lastName: firstName.text.trim(),
                   );
               setState(() {
                 errorMessage = a;
