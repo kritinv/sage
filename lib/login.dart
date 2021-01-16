@@ -95,7 +95,7 @@ class _SignUpState extends State<SignUp> {
                     email: email.text.trim(),
                     password: password.text.trim(),
                     firstName: firstName.text.trim(),
-                    lastName: firstName.text.trim(),
+                    lastName: lastName.text.trim(),
                   );
               setState(() {
                 errorMessage = a;

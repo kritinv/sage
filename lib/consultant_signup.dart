@@ -1,28 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'package:the_unnamed_startup/time_slot.dart';
-import 'package:the_unnamed_startup/meeting_confirmation.dart';
-import 'package:the_unnamed_startup/main_pages/home.dart';
-import 'package:the_unnamed_startup/data/data.dart';
+import 'package:the_unnamed_startup/main_pages/user_profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ConsultantSignUp extends StatefulWidget {
   static const routeName = "/consultantsignup";
-  ConsultantSignUp({Key key, this.title}) : super(key: key);
   final String title;
+  ConsultantSignUp({Key key, this.title}) : super(key: key);
   @override
   _ConsultantSignUpState createState() => _ConsultantSignUpState();
 }
 
 class _ConsultantSignUpState extends State<ConsultantSignUp> {
+  TextEditingController controller = TextEditingController();
   String time;
+  String skill;
   String state;
+  String skillState;
   List<String> times = [];
+  List<String> skills = [];
   List<Widget> slots = [];
-  List<String> selected = [];
+  List<Widget> specialties = [];
+  List<String> selectedTimes = [];
+  List<String> selectedSkills = [];
 
   void updateTime(String selected) {
     setState(() {
       time = selected;
+    });
+  }
+
+  void updateSkill(String selected) {
+    setState(() {
+      skill = selected;
     });
   }
 
@@ -32,11 +42,25 @@ class _ConsultantSignUpState extends State<ConsultantSignUp> {
     });
   }
 
+  void updateSkillState(String selected) {
+    setState(() {
+      skillState = selected;
+    });
+  }
+
   void updateSelected(String time, String state) {
     if (state == 'Selected') {
-      selected.add(time);
+      selectedTimes.add(time);
     } else {
-      selected.remove(time);
+      selectedTimes.remove(time);
+    }
+  }
+
+  void updateSelectedSkills(String skill, String state) {
+    if (state == 'Selected') {
+      selectedSkills.add(skill);
+    } else {
+      selectedSkills.remove(skill);
     }
   }
 
@@ -57,10 +81,36 @@ class _ConsultantSignUpState extends State<ConsultantSignUp> {
           (String time) {
             updateTime(time);
             updateSelected(time, state);
-            print(selected);
+            print(selectedTimes);
           },
           (String state) {
             updateState(state);
+          },
+        ),
+      );
+    }
+
+    skills = [
+      'Resume',
+      'Interview',
+      'Essays',
+      'Extracurriculars',
+      'Community Service',
+      'Research',
+    ];
+
+    for (int i = 0; i < 6 - 1; i += 2) {
+      specialties.add(
+        SlotDouble(
+          skills[i],
+          skills[i + 1],
+          (String skill) {
+            updateSkill(skill);
+            updateSelectedSkills(skill, skillState);
+            print(selectedSkills);
+          },
+          (String skill) {
+            updateSkillState(skill);
           },
         ),
       );
@@ -69,6 +119,7 @@ class _ConsultantSignUpState extends State<ConsultantSignUp> {
 
   @override
   Widget build(BuildContext context) {
+    final UserData currentUserData = ModalRoute.of(context).settings.arguments;
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.green,
@@ -84,79 +135,82 @@ class _ConsultantSignUpState extends State<ConsultantSignUp> {
         body: Container(
           margin: const EdgeInsets.only(
               left: 20.0, right: 20.0, top: 20, bottom: 20),
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(child: Container(child: ListView(children: slots))),
-                SizedBox(
-                  height: 30.0,
-                ),
-                Text(
-                  'Subject',
-                  textAlign: TextAlign.start,
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green))),
-                ),
-                SizedBox(
-                  height: 20.0,
-                ),
-                Text(
-                  'Special Note',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                TextFormField(
-                  keyboardType: TextInputType.multiline,
-                  minLines: 1,
-                  maxLines: 10,
-                  decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green)),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.green))),
-                ),
-                SizedBox(height: 40),
-                Center(
-                  child: ButtonTheme(
-                      minWidth: 150,
-                      height: 50,
-                      child: RaisedButton(
-                        onPressed: () {
-                          names.add("Ray Doe");
-                          cardID["Ray Doe"] = {
-                            'firstName': 'Ray',
-                            'lastName': 'Doe',
-                            'bio': 'Genius Child',
-                            'rating': '4.2',
-                            'image': 'images/ray.png',
-                            'specialty': [
-                              'Extracurriculars',
-                              'Community Service',
-                            ],
-                            "availability": selected
-                          };
-                          status = "consultant";
-                          Navigator.pop(context);
-                        },
-                        textColor: Colors.white,
-                        color: Colors.green,
-                        onHighlightChanged: (boolValue) => print(boolValue),
-                        elevation: 8,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(18.0),
-                          side: BorderSide(color: Colors.green),
-                        ),
-                        child: new Text('Join'),
-                      )),
-                ),
-                SizedBox(height: 20)
-              ]),
+          child: ListView(children: [
+            SizedBox(
+              height: 20.0,
+            ),
+            Text(
+              'Available Times',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Container(height: 250, child: ListView(children: slots)),
+            SizedBox(height: 40),
+            Text(
+              'Specialty',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Container(height: 250, child: Column(children: specialties)),
+            SizedBox(
+              height: 40.0,
+            ),
+            Text(
+              'Caption',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            TextFormField(
+              controller: controller,
+              keyboardType: TextInputType.multiline,
+              minLines: 1,
+              maxLines: 1,
+              decoration: InputDecoration(
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green)),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.green))),
+            ),
+            SizedBox(height: 40),
+            Center(
+              child: ButtonTheme(
+                  minWidth: 150,
+                  height: 50,
+                  child: RaisedButton(
+                    onPressed: () async {
+                      await FirebaseFirestore.instance
+                          .collection('mentors')
+                          .doc(currentUserData.currentUser)
+                          .set({
+                        "firstName": currentUserData.userData['firstName'],
+                        'lastName': currentUserData.userData['lastName'],
+                        'caption': controller.text,
+                        'image': currentUserData.userData['imageURL'],
+                        'rating': 'U',
+                        'specialty': selectedSkills,
+                        "availability": selectedTimes
+                      });
+                      Navigator.pop(context);
+                    },
+                    textColor: Colors.white,
+                    color: Colors.green,
+                    onHighlightChanged: (boolValue) => print(boolValue),
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(18.0),
+                      side: BorderSide(color: Colors.green),
+                    ),
+                    child: new Text('Join'),
+                  )),
+            ),
+            SizedBox(height: 20)
+          ]),
         ));
   }
 }

@@ -1,125 +1,44 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:the_unnamed_startup/custom_widgets/name_card.dart';
-import 'package:the_unnamed_startup/data/data.dart';
 import 'dart:collection';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key key, this.filteredList}) : super(key: key);
-  final List filteredList;
+  final String category;
+  const Home({Key key, @required this.category}) : super(key: key);
   @override
   _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  // search bar variables
-  final TextEditingController _filter = TextEditingController();
-  String _searchText = '';
-  String dropdownValue = 'Rating';
+  TextEditingController filter;
+  String dropdownValue;
+  Map cardID;
   List filteredNames;
-  List<Widget> cardList;
+  List names;
+  Widget cardList;
+  String category;
 
+  // constructor
   @override
   void initState() {
-    filteredNames = widget.filteredList;
-    sort('Rating');
-    this.cardList = filteredNames
-        .map((name) => NameCard(
-            firstName: cardID[name]['firstName'],
-            lastName: cardID[name]['lastName'],
-            rating: cardID[name]['rating'],
-            bio: cardID[name]['bio'],
-            image: cardID[name]['image'],
-            availability: cardID[name]['availability']))
-        .toList();
-    super.initState();
+    print("Home Page Object Created");
+    filter = TextEditingController();
+    dropdownValue = "Rating";
+    // stream variables
+    cardID = {};
+    filteredNames = [];
+    names = [];
+    // category
+    print("hi");
   }
-
-  // search bar functions
-  _HomeState() {
-    print("new home object created");
-    if (filteredNames == null) {
-      filteredNames = List<String>.from(names);
-    }
-    _filter.addListener(() {
-      if (_filter.text.isEmpty) {
-        setState(() {
-          _searchText = "";
-          filteredNames = names;
-        });
-      } else {
-        setState(() {
-          _searchText = _filter.text;
-        });
-      }
-    });
-  }
-
-  void _buildList() {
-    if (_searchText.isNotEmpty) {
-      List tempList = List();
-      for (int i = 0; i < filteredNames.length; i++) {
-        if (filteredNames[i]
-            .toLowerCase()
-            .contains(_searchText.toLowerCase())) {
-          tempList.add(filteredNames[i]);
-        }
-      }
-      filteredNames = tempList;
-    }
-  }
-
-  void _search(value) {
-    _searchText = value;
-    _buildList();
-    setState(() {
-      buildCardList();
-    });
-  }
-
-  // filter function
-  void sort(newValue) {
-    dropdownValue = newValue;
-    String split = newValue.split(" ").join();
-    String join = split[0].toLowerCase() + split.substring(1, split.length);
-    print(filteredNames);
-
-    List sortedList = filteredNames.map((name) => cardID[name][join]).toList();
-    Map mappings = {
-      for (int i = 0; i < sortedList.length; i++)
-        filteredNames[i]: sortedList[i]
-    };
-
-    var sortedKeys = mappings.keys.toList(growable: false)
-      ..sort((k1, k2) => mappings[k1].compareTo(mappings[k2]));
-    LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(sortedKeys,
-        key: (k) => k, value: (k) => mappings[k]);
-
-    if (join == 'rating') {
-      filteredNames = sortedMap.keys.toList().reversed.toList();
-    } else {
-      filteredNames = sortedMap.keys.toList();
-    }
-  }
-
-  // card list functions
-  void buildCardList() {
-    cardList = filteredNames
-        .map((name) => NameCard(
-              firstName: cardID[name]['firstName'],
-              lastName: cardID[name]['lastName'],
-              rating: cardID[name]['rating'],
-              bio: cardID[name]['bio'],
-              image: cardID[name]['image'],
-              availability: cardID[name]['availability'],
-            ))
-        .toList();
-  }
-
-  //***************************************************************************
 
   @override
   Widget build(BuildContext context) {
+    category = widget.category;
+    cardList = ClassList("", dropdownValue, category);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -135,7 +54,7 @@ class _HomeState extends State<Home> {
                 margin: EdgeInsets.only(left: 12),
                 child: TextField(
                   textInputAction: TextInputAction.search,
-                  controller: _filter,
+                  controller: filter,
                   style: TextStyle(fontSize: 14.0),
                   decoration: InputDecoration(
                     hintText: 'Search...',
@@ -144,7 +63,10 @@ class _HomeState extends State<Home> {
                     contentPadding: EdgeInsets.only(bottom: 5.0),
                   ),
                   onChanged: (value) {
-                    _search(value);
+                    setState(() {
+                      cardList =
+                          ClassList(filter.text, dropdownValue, category);
+                    });
                   },
                 ),
               ),
@@ -175,8 +97,8 @@ class _HomeState extends State<Home> {
                       ),
                       onChanged: (String newValue) {
                         setState(() {
-                          sort(newValue);
-                          buildCardList();
+                          dropdownValue = newValue;
+                          cardList = ClassList(filter.text, newValue, category);
                         });
                       },
                       items: <String>[
@@ -209,12 +131,175 @@ class _HomeState extends State<Home> {
         ),
 
         // Card List
-        Expanded(
-          child: Container(
-            child: ListView(children: cardList),
-          ),
-        ),
+        cardList,
       ],
+    );
+  }
+}
+
+class ClassList extends StatefulWidget {
+  String searchText;
+  String sortBy;
+  String category;
+  ClassList(this.searchText, this.sortBy, this.category);
+  @override
+  _ClassListState createState() => _ClassListState();
+}
+
+class _ClassListState extends State<ClassList> {
+  Map cardID = {};
+  List filteredNames = [];
+  List<NameCard> cardList = [];
+  List names = []
+  CollectionReference users;
+
+  void sort(newValue) {
+    String split = newValue.split(" ").join();
+    String join = split[0].toLowerCase() + split.substring(1, split.length);
+    List sortedList = filteredNames.map((name) => cardID[name][join]).toList();
+    Map mappings = {
+      for (int i = 0; i < sortedList.length; i++)
+        filteredNames[i]: sortedList[i]
+    };
+    var sortedKeys = mappings.keys.toList(growable: false)
+      ..sort((k1, k2) => mappings[k1].compareTo(mappings[k2]));
+    LinkedHashMap sortedMap = new LinkedHashMap.fromIterable(sortedKeys,
+        key: (k) => k, value: (k) => mappings[k]);
+    if (join == 'rating') {
+      filteredNames = sortedMap.keys.toList().reversed.toList();
+    } else {
+      filteredNames = sortedMap.keys.toList();
+    }
+  }
+
+  void filterByCategory(category) {
+    if (category != 'All') {
+      filteredNames = [];
+      print(filteredNames);
+      for (int i = 0; i < names.length; i++) {
+        List list = cardID[names[i]]['specialty'];
+        if (list.contains(category)) {
+          filteredNames.add(names[i]);
+        }
+      }
+      print(filteredNames);
+    }
+  }
+
+  Future<String> downloadUserData() {
+    users = FirebaseFirestore.instance.collection('mentors');
+
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    Stopwatch watch = new Stopwatch();
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: users.snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Container();
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            if (watch.elapsedMilliseconds <= 100) {
+              return Container();
+            } else {
+              return Expanded(
+                child: Container(
+                  child: ListView(
+                    children: List.filled(10, LoadingScreen()),
+                  ),
+                ),
+              );
+            }
+          }
+
+          z
+
+          names = cardID.keys.toList();
+          filteredNames = cardID.keys.toList();
+          filterByCategory(widget.category);
+
+          if (widget.searchText.isNotEmpty || widget.searchText != "") {
+            List tempList = List();
+            for (int i = 0; i < filteredNames.length; i++) {
+              if (filteredNames[i]
+                  .toLowerCase()
+                  .contains(widget.searchText.toLowerCase())) {
+                tempList.add(filteredNames[i]);
+              }
+            }
+            filteredNames = tempList;
+          }
+
+          sort(widget.sortBy);
+
+          cardList = filteredNames
+              .map((name) => NameCard(
+                  firstName: cardID[name]['firstName'],
+                  lastName: cardID[name]['lastName'],
+                  rating: cardID[name]['rating'],
+                  bio: cardID[name]['caption'],
+                  imageURL: cardID[name]['image'],
+                  availability: cardID[name]['availability']))
+              .toList();
+
+          return Expanded(
+              child: Container(child: ListView(children: cardList)));
+        });
+  }
+}
+
+class LoadingScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Padding(
+        padding: EdgeInsets.all(15),
+        child: Row(
+          children: <Widget>[
+            CircleAvatar(
+              backgroundColor: Colors.lightGreen[200],
+              radius: 35,
+            ),
+            Expanded(
+              child: Container(
+                margin: EdgeInsets.only(left: 20),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        width: 50,
+                        height: 20,
+                        decoration: BoxDecoration(
+                            color: Colors.lightGreen[200],
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                      Divider(
+                        thickness: 3,
+                        color: Colors.lightGreen[200],
+                      ),
+                      Container(
+                        width: 80,
+                        height: 15,
+                        decoration: BoxDecoration(
+                            color: Colors.lightGreen[200],
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
+                    ]),
+              ),
+            ),
+            CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.lightGreen[200],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

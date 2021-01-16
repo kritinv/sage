@@ -10,9 +10,9 @@ import 'package:the_unnamed_startup/main_pages.dart';
 import 'main_pages.dart';
 import 'time_slot.dart';
 import 'login.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +43,7 @@ class MyAppState extends State<MyApp> {
         initialRoute: '/',
         routes: {
           '/': (context) => AuthenticationWrapper(),
-          MainScreen.routeName: (context) => MainScreen(0),
+          MainScreen.routeName: (context) => MainScreen(0, '', {}, ""),
           Profile.routeName: (context) => Profile(),
           TimeSlot.routeName: (context) => TimeSlot(),
           MeetingConfirmation.routeName: (context) => MeetingConfirmation(),
@@ -58,13 +58,50 @@ class MyAppState extends State<MyApp> {
 }
 
 class AuthenticationWrapper extends StatelessWidget {
+  Map userData = {};
+  var imageURL;
+  var currentUser;
+
+  Future<String> downloadAll() async {
+    print("ok");
+    await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: FirebaseAuth.instance.currentUser.email)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        userData['firstName'] = doc['firstName'];
+        userData['lastName'] = doc['lastName'];
+        userData['bio'] = doc['bio'];
+        userData['status'] = doc['status'];
+        userData['imageURL'] = 'ray';
+        currentUser = doc.id;
+      });
+    });
+    imageURL = await firebase_storage.FirebaseStorage.instance
+        .ref("${userData['imageURL']}.png")
+        .getDownloadURL();
+
+    return imageURL;
+  }
+
   @override
   Widget build(BuildContext context) {
     final firebaseUser = context.watch<User>();
     if (firebaseUser != null) {
-      return MainScreen(0);
+      return FutureBuilder<String>(
+          future: downloadAll(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return MainScreen(0, currentUser, userData, imageURL);
+            } else {
+              print('Error: Cannot Authenticate User');
+              return Login();
+            }
+          });
+    } else {
+      return Login();
     }
-    return Login();
   }
 }
 
@@ -72,6 +109,8 @@ class AuthenticationService {
   final FirebaseAuth _firebaseAuth;
   AuthenticationService(this._firebaseAuth);
   Stream<User> get authStateChanges => _firebaseAuth.authStateChanges();
+  Future<DocumentSnapshot> userData;
+
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
@@ -98,11 +137,12 @@ class AuthenticationService {
         FirebaseFirestore.instance
             .collection('users')
             .add({
-              email: {
-                "firstName": firstName,
-                'lastName': lastName,
-                'password': password,
-              }
+              "firstName": firstName,
+              'lastName': lastName,
+              "imageURL": "ray",
+              "email": email,
+              "bio": "",
+              "status": "normal",
             })
             .then((value) => print("User Added"))
             .catchError((error) => print("Failed to add user: $error"));

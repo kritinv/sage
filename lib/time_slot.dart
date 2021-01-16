@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:the_unnamed_startup/custom_widgets/name_card.dart';
-import 'package:the_unnamed_startup/profile.dart';
 import 'package:the_unnamed_startup/meeting_confirmation.dart';
-import 'package:the_unnamed_startup/data/data.dart';
 
 typedef void StringCallBack(String time);
 typedef void StateCallBack(String state);

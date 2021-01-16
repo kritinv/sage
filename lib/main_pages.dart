@@ -2,48 +2,68 @@ import 'package:flutter/material.dart';
 import 'package:the_unnamed_startup/main_pages/completed.dart';
 import 'package:the_unnamed_startup/main_pages/home.dart';
 import 'package:the_unnamed_startup/main_pages/bookings.dart';
-import 'package:the_unnamed_startup/data/data.dart';
 import 'package:the_unnamed_startup/main_pages/user_profile.dart';
 import 'meeting_confirmation.dart';
-import 'package:provider/provider.dart';
-import 'main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'login.dart';
 
 class MainScreen extends StatefulWidget {
   static const routeName = '/mainscreen';
   int selectedIndex;
-  MainScreen(this.selectedIndex);
+  Map userData;
+  String currentUser;
+  String imageURL;
+  MainScreen(
+      this.selectedIndex, this.currentUser, this.userData, this.imageURL);
 
   @override
-  _MainScreenState createState() => _MainScreenState(selectedIndex);
+  _MainScreenState createState() =>
+      _MainScreenState(selectedIndex, currentUser, userData, imageURL);
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int selectedIndex;
   int count = 0;
-  _MainScreenState(selectedIndex) {
+
+  // variables initialized in constructor
+  int selectedIndex;
+  String imageURL;
+  List names;
+  String currentUser;
+
+  // variables declared after stream is processed
+  List filteredNames = [];
+  Map cardID = {};
+  Map userData = {};
+  Widget page = Home(category: "All", key: UniqueKey());
+
+  // constructor
+  _MainScreenState(selectedIndex, currentUser, userData, imageURL) {
+    this.imageURL = imageURL;
     this.selectedIndex = selectedIndex;
+    this.currentUser = currentUser;
+    this.userData = userData;
   }
 
-  Widget page = Home(filteredList: List<String>.from(names));
-  List filteredNames = List<String>.from(names);
-
+  // filter cards by specialty category
   void filterByCategory(category) {
     filteredNames = [];
-    print(filteredNames);
     for (int i = 0; i < names.length; i++) {
       List list = cardID[names[i]]['specialty'];
       if (list.contains(category)) {
         filteredNames.add(names[i]);
       }
     }
-    print(filteredNames);
   }
 
+  // callback for user profile becoming consultant
   void updateConsultantList() {
     setState(() {
       filteredNames = names;
+    });
+  }
+
+  // callback for updating user profile image
+  void updateDP(newImageURL) {
+    setState(() {
+      imageURL = newImageURL;
     });
   }
 
@@ -55,19 +75,13 @@ class _MainScreenState extends State<MainScreen> {
       selectedIndex = args.selectedIndex;
       count++;
     }
+    print(imageURL);
 
     return Scaffold(
       body: page,
       backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors.green[900],
-      ),
       drawer: Drawer(
-        // Add a ListView to the drawer. This ensures the user can scroll
-        // through the options in the drawer if there isn't enough vertical
-        // space to fit everything.
         child: ListView(
-          // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: <Widget>[
             Container(
@@ -104,9 +118,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('All'),
               onTap: () {
-                filteredNames = List<String>.from(names);
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: 'All', key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -114,18 +127,16 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
                 title: Text('Resume'),
                 onTap: () {
-                  filterByCategory('Resume');
                   setState(() {
-                    page = Home(filteredList: filteredNames, key: UniqueKey());
+                    page = Home(category: 'Resume', key: UniqueKey());
                     Navigator.pop(context);
                   });
                 }),
             ListTile(
               title: Text('Interview'),
               onTap: () {
-                filterByCategory('Interview');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: 'Interview', key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -133,9 +144,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('Essays'),
               onTap: () {
-                filterByCategory('Essays');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: 'Essays', key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -143,9 +153,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('Extracurriculars'),
               onTap: () {
-                filterByCategory('Extracurriculars');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: 'Extracurriculars', key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -153,9 +162,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('Community Service'),
               onTap: () {
-                filterByCategory('Community Service');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: "Community Service", key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -163,9 +171,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('Research'),
               onTap: () {
-                filterByCategory('Research');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: "Research", key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -173,9 +180,8 @@ class _MainScreenState extends State<MainScreen> {
             ListTile(
               title: Text('General Advice'),
               onTap: () {
-                filterByCategory('General Advice');
                 setState(() {
-                  page = Home(filteredList: filteredNames, key: UniqueKey());
+                  page = Home(category: 'General Advice', key: UniqueKey());
                   Navigator.pop(context);
                 });
               },
@@ -183,14 +189,11 @@ class _MainScreenState extends State<MainScreen> {
             SizedBox(
               height: 30.0,
             ),
-            RaisedButton(
-                child: Text(' Logout'),
-                color: Color(0xffFF8F00),
-                onPressed: () {
-                  context.read<AuthenticationService>().signOut();
-                }),
           ],
         ),
+      ),
+      appBar: AppBar(
+        backgroundColor: Colors.green[900],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -220,13 +223,14 @@ class _MainScreenState extends State<MainScreen> {
             () {
               selectedIndex = index;
               if (selectedIndex == 0) {
-                page = Home(filteredList: filteredNames, key: UniqueKey());
+                page = Home(category: "All", key: UniqueKey());
               } else if (selectedIndex == 1) {
                 page = Bookings();
               } else if (selectedIndex == 2) {
                 page = Completed();
               } else if (selectedIndex == 3) {
-                page = UserProfile(updateConsultantList);
+                page = UserProfile(updateConsultantList, currentUser, userData,
+                    imageURL, updateDP);
               }
             },
           );

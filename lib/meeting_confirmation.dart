@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:the_unnamed_startup/time_slot.dart';
-import 'package:the_unnamed_startup/data/data.dart';
 import 'package:the_unnamed_startup/main_pages/bookings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookingArguments {
   final int selectedIndex;
@@ -72,7 +72,14 @@ class MeetingConfirmation extends StatelessWidget {
                 margin: EdgeInsets.symmetric(vertical: 30),
                 child: RaisedButton(
                   onPressed: () {
-                    userId.add(args.arg.firstName + " " + args.arg.lastName);
+                    // FirebaseFirestore.instance
+                    //     .collection('users')
+                    //     .doc(curentUser)
+                    //     .add({})
+                    //     .then((value) => print("User Added"))
+                    //     .catchError(
+                    //         (error) => print("Failed to add user: $error"));
+
                     Navigator.pop(context);
                     Navigator.pop(context);
                     Navigator.pop(context);
